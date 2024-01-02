@@ -50,6 +50,7 @@ router.post(
       const usernameExists = await User.findOne({ username: val });
       if (usernameExists) throw new Error('Username already exists');
     }),
+  body('password', 'Password must be at least 6 characters long').trim().isLength({ min: 6 }),
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(401).json({ err: errors.array(), type: 'bodyValidation' });
