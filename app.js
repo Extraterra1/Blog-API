@@ -3,10 +3,15 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
+const mongoose = require('mongoose');
 
 const apiRouter = require('./routes/apiRouter');
 
+require('dotenv').config();
 const app = express();
+mongoose.connect(process.env.DB_URL);
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'mongo connection error'));
 
 app.use(cors());
 app.use(logger('dev'));
