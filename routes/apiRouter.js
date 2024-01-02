@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const asyncHandler = require('express-async-handler');
+const jwt = require('jsonwebtoken');
+
 const User = require('../models/userModel');
 
 /* GET home page. */
@@ -19,7 +21,11 @@ router.post(
       username: req.body.username
     });
     await newUser.save();
-    return res.json({ message: 'user created', token: 'idk lol' });
+    const cleanUser = { email: newUser.email, username: newUser.username, role: newUser.role };
+    jwt.sign({ user: cleanUser }, process.env.JWT_SECRET, (err, token) => {
+      if (err) return res.status(500).json({ err });
+      return res.json({ token, user: cleanUser });
+    });
   })
 );
 
