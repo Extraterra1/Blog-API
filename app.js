@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const errorHandler = require('./middleware/errorHandler');
 
 const apiRouter = require('./routes/apiRouter');
 
@@ -21,5 +22,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', apiRouter);
+app.use(errorHandler);
 
 module.exports = app;
