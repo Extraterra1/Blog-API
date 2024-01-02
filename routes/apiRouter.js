@@ -12,6 +12,23 @@ router.get('/', function (req, res, next) {
 });
 
 router.post(
+  '/login',
+  asyncHandler(async (req, res) => {
+    const user = await User.findOne({
+      $or: [{ username: req.body.username }, { email: req.body.email }]
+    });
+    if (!user) return res.status(403).json({ err: 'Wrong username/password' });
+    const isValidPassword = await bcrypt.compare(req.body.password, user.password);
+    if (!isValidPassword) return res.status(403).json({ err: 'Wrong username/passwordss' });
+    const cleanUser = { email: user.email, username: user.username, role: user.role };
+    jwt.sign({ user: cleanUser }, process.env.JWT_SECRET, (err, token) => {
+      if (err) return res.status(500).json({ err });
+      return res.json({ token, user: cleanUser });
+    });
+  })
+);
+
+router.post(
   '/register',
   asyncHandler(async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
