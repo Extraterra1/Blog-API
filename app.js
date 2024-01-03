@@ -5,6 +5,7 @@ const logger = require('morgan');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const errorHandler = require('./middleware/errorHandler');
+const handle404 = require('./middleware/handle404');
 
 const apiRouter = require('./routes/apiRouter');
 
@@ -22,6 +23,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api', apiRouter);
+
 app.use(errorHandler);
+app.use(handle404);
 
 module.exports = app;
