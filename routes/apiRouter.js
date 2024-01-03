@@ -19,4 +19,6 @@ router.post('/posts/create', setToken, postsController.createPost);
 
 router.delete('/posts/:id', setToken, postsController.deletePost);
 
+router.put('/posts/:id', setToken, postsController.editPost);
+
 module.exports = router;

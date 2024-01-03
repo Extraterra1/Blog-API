@@ -19,10 +19,10 @@ exports.login = [
       $or: [{ username: req.body.username }, { email: req.body.email }]
     });
 
-    if (!user) return res.status(401).json({ err: 'Wrong username/password' });
+    if (!user) return res.status(401).json({ err: { message: 'Wrong username/password' } });
 
     const isValidPassword = await bcrypt.compare(req.body.password, user.password);
-    if (!isValidPassword) return res.status(401).json({ err: 'Wrong username/passwords' });
+    if (!isValidPassword) return res.status(401).json({ err: { message: 'Wrong username/passwords' } });
 
     const cleanUser = { email: user.email, username: user.username, role: user.role };
     jwt.sign({ user: cleanUser }, process.env.JWT_SECRET, (err, token) => {

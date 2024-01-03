@@ -28,8 +28,8 @@ exports.createPost = [
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(401).json({ err: errors.array(), type: 'bodyValidation' });
 
-    const user = await authController.verifyAsync(req.token, process.env.JWT_SECRET);
-    console.log(user);
+    const tokenData = await authController.verifyAsync(req.token, process.env.JWT_SECRET);
+    if (tokenData.user.role !== 'author') return res.status(401).json({ err: { message: 'You need to be an author to create a post' } });
 
     const newPost = new Post({ title: req.body.title, content: req.body.content, author: req.body.author });
     await newPost.save();
@@ -49,3 +49,32 @@ exports.deletePost = asyncHandler(async (req, res) => {
 
   return res.json({ deletedPost });
 });
+
+exports.editPost = [
+  body('title', 'Title must not be empty').trim().isLength({ min: 1 }).escape(),
+  body('content', 'Content must not be empty').trim().isLength({ min: 1 }).escape(),
+  body('author', 'Invalid Author')
+    .trim()
+    .escape()
+    .custom(async (val) => {
+      if (!ObjectId.isValid(val)) throw new Error('Invalid Author ID');
+      const user = await User.findOne({ _id: val, role: 'author' });
+      if (!user) throw new Error('Author not found');
+    }),
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(401).json({ err: errors.array(), type: 'bodyValidation' });
+
+    const tokenData = await authController.verifyAsync(req.token, process.env.JWT_SECRET);
+    if (tokenData.user.role !== 'author') return res.status(401).json({ err: { message: 'You need to be an author to edit a post' } });
+
+    if (!ObjectId.isValid(req.params.id)) return res.status(401).json({ err: { message: 'Invalid Post' } });
+
+    const post = new Post({ title: req.body.title, content: req.body.content, author: req.body.author, _id: req.params.id });
+
+    const updatedPost = await Post.findByIdAndUpdate(req.params.id, post);
+    if (!updatedPost) return res.status(401).json({ err: { message: 'Post not found' } });
+
+    return res.json({ updatedPost });
+  })
+];
