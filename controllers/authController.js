@@ -2,8 +2,11 @@ const bcrypt = require('bcryptjs');
 const asyncHandler = require('express-async-handler');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
+const util = require('util');
 
 const User = require('../models/userModel');
+
+exports.verifyAsync = util.promisify(jwt.verify);
 
 exports.login = [
   body('username', 'Bad request').trim().isLength({ min: 2 }).optional(),

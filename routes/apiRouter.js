@@ -13,8 +13,10 @@ router.post('/login', authController.login);
 
 router.post('/register', authController.register);
 
-router.get('/posts', setToken, postsController.getPosts);
+router.get('/posts', postsController.getPosts);
 
 router.post('/posts/create', setToken, postsController.createPost);
+
+router.delete('/posts/:id', setToken, postsController.deletePost);
 
 module.exports = router;
