@@ -15,6 +15,8 @@ router.post('/register', authController.register);
 
 router.get('/posts', postsController.getPosts);
 
+router.get('/posts/:id', postsController.postDetail);
+
 router.post('/posts/create', setToken, postsController.createPost);
 
 router.delete('/posts/:id', setToken, postsController.deletePost);
