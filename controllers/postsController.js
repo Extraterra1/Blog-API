@@ -8,7 +8,7 @@ const Post = require('../models/postModel');
 const User = require('../models/userModel');
 
 exports.getPosts = asyncHandler(async (req, res) => {
-  const posts = await Post.find().sort({ added: 1 });
+  const posts = await Post.find().sort({ added: 1 }).populate('author');
 
   return res.json({ posts, count: posts.length });
 });
