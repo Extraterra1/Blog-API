@@ -3,6 +3,7 @@ const asyncHandler = require('express-async-handler');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const util = require('util');
+const moment = require('moment');
 
 const User = require('../models/userModel');
 
@@ -25,7 +26,7 @@ exports.login = [
     if (!isValidPassword) return res.status(401).json({ err: { message: 'Wrong username/passwords' } });
 
     const cleanUser = { email: user.email, username: user.username, role: user.role };
-    jwt.sign({ user: cleanUser }, process.env.JWT_SECRET, (err, token) => {
+    jwt.sign({ user: cleanUser, exp: moment().add(3, 'days').unix() }, process.env.JWT_SECRET, (err, token) => {
       if (err) return res.status(500).json({ err });
       return res.json({ token, user: cleanUser });
     });
