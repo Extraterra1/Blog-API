@@ -63,7 +63,7 @@ exports.register = [
     await newUser.save();
 
     const cleanUser = { email: newUser.email, username: newUser.username, role: newUser.role };
-    jwt.sign({ user: cleanUser }, process.env.JWT_SECRET, (err, token) => {
+    jwt.sign({ user: cleanUser, exp: moment().add(3, 'days').unix() }, process.env.JWT_SECRET, (err, token) => {
       if (err) return res.status(500).json({ err });
       return res.json({ token, user: cleanUser });
     });
