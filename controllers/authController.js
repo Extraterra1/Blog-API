@@ -17,7 +17,7 @@ exports.login = [
     if (!errors.isEmpty()) return res.status(401).json({ err: errors.array()[0].msg });
 
     const user = await User.findOne({
-      $or: [{ username: req.body.username }, { email: req.body.email }]
+      $or: [{ username: req.body.username }, { email: req.body.username }]
     });
 
     if (!user) return res.status(401).json({ err: { message: 'Wrong username/password' } });
