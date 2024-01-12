@@ -23,4 +23,6 @@ router.delete('/posts/:id', setToken, postsController.deletePost);
 
 router.patch('/posts/:id', setToken, postsController.editPost);
 
+router.get('/users/:id/posts', postsController.getPostsByUser);
+
 module.exports = router;

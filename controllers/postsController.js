@@ -22,6 +22,15 @@ exports.postDetail = asyncHandler(async (req, res) => {
   return res.json({ post });
 });
 
+exports.getPostsByUser = asyncHandler(async (req, res) => {
+  if (!ObjectId.isValid(req.params.id)) return res.status(401).json({ err: { message: 'Invalid User' } });
+
+  const posts = await Post.find({ author: req.params.id }).populate('author');
+  if (posts.length === 0) return res.json({ posts, msg: 'No posts by this author' });
+
+  return res.json({ posts });
+});
+
 exports.createPost = [
   body('title', 'Title must not be empty').trim().isLength({ min: 1 }).escape(),
   body('content', 'Content must not be empty').trim().isLength({ min: 1 }).escape(),
