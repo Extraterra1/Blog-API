@@ -25,7 +25,7 @@ exports.login = [
     const isValidPassword = await bcrypt.compare(req.body.password, user.password);
     if (!isValidPassword) return res.status(401).json({ err: { message: 'Wrong username/passwords' } });
 
-    const cleanUser = { email: user.email, username: user.username, role: user.role };
+    const cleanUser = { email: user.email, username: user.username, role: user.role, id: user._id };
     jwt.sign({ user: cleanUser, exp: moment().add(3, 'days').unix() }, process.env.JWT_SECRET, (err, token) => {
       if (err) return res.status(500).json({ err });
       return res.json({ token, user: cleanUser });
@@ -62,7 +62,7 @@ exports.register = [
     });
     await newUser.save();
 
-    const cleanUser = { email: newUser.email, username: newUser.username, role: newUser.role };
+    const cleanUser = { email: newUser.email, username: newUser.username, role: newUser.role, id: newUser._id };
     jwt.sign({ user: cleanUser, exp: moment().add(3, 'days').unix() }, process.env.JWT_SECRET, (err, token) => {
       if (err) return res.status(500).json({ err });
       return res.json({ token, user: cleanUser });
