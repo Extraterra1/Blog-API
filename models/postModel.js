@@ -20,6 +20,10 @@ const postSchema = new Schema({
   added: {
     type: Date,
     default: Date.now
+  },
+  imgUrl: {
+    type: String,
+    trim: true
   }
 });
 

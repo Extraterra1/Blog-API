@@ -7,6 +7,9 @@ const authController = require('./authController');
 const Post = require('../models/postModel');
 const User = require('../models/userModel');
 
+const imgRegex =
+  /(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?\/[a-zA-Z0-9]{2,}|((https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z]{2,}(\.[a-zA-Z]{2,})(\.[a-zA-Z]{2,})?)|(https:\/\/www\.|http:\/\/www\.|https:\/\/|http:\/\/)?[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}\.[a-zA-Z0-9]{2,}(\.[a-zA-Z0-9]{2,})?/g;
+
 exports.getPosts = asyncHandler(async (req, res) => {
   const posts = await Post.find().sort({ added: 1 }).populate('author');
 
@@ -34,6 +37,7 @@ exports.getPostsByUser = asyncHandler(async (req, res) => {
 exports.createPost = [
   body('title', 'Title must not be empty').trim().isLength({ min: 1 }).escape(),
   body('content', 'Content must not be empty').trim().isLength({ min: 1 }).escape(),
+  body('imgUrl', 'Invalid Image URL').trim().optional().matches(imgRegex),
   body('author', 'Invalid Author')
     .trim()
     .escape()
@@ -49,7 +53,7 @@ exports.createPost = [
     const tokenData = await authController.verifyAsync(req.token, process.env.JWT_SECRET);
     if (tokenData.user.role !== 'author') return res.status(403).json({ err: { message: 'You need to be an author to create a post' } });
 
-    const newPost = new Post({ title: req.body.title, content: req.body.content, author: req.body.author });
+    const newPost = new Post({ title: req.body.title, content: req.body.content, author: req.body.author, imgUrl: req.body.imgUrl });
     await newPost.save();
 
     return res.json({ newPost });
@@ -70,6 +74,7 @@ exports.deletePost = asyncHandler(async (req, res) => {
 
 exports.editPost = [
   body('title', 'Title must not be empty').trim().isLength({ min: 1 }).escape(),
+  body('imgUrl', 'Invalid Image URL').trim().optional().matches(imgRegex),
   body('content', 'Content must not be empty').trim().isLength({ min: 1 }).escape(),
   body('author', 'Invalid Author')
     .trim()
@@ -88,7 +93,7 @@ exports.editPost = [
 
     if (!ObjectId.isValid(req.params.id)) return res.status(401).json({ err: { message: 'Invalid Post' } });
 
-    const post = new Post({ title: req.body.title, content: req.body.content, author: req.body.author, _id: req.params.id });
+    const post = new Post({ title: req.body.title, content: req.body.content, author: req.body.author, _id: req.params.id, imgUrl: req.body.imgUrl });
 
     const updatedPost = await Post.findByIdAndUpdate(req.params.id, post);
     if (!updatedPost) return res.status(404).json({ err: { message: 'Post not found' } });
