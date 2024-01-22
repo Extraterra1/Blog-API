@@ -2,6 +2,7 @@ const asyncHandler = require('express-async-handler');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const { body, validationResult } = require('express-validator');
+const authController = require('./authController.js');
 
 const Comment = require('../models/CommentModel.js');
 const User = require('../models/userModel.js');
@@ -51,3 +52,13 @@ exports.createComment = [
     return res.json({ newComment });
   })
 ];
+
+exports.likeComment = asyncHandler(async (req, res) => {
+  if (!ObjectId.isValid(req.params.id)) return res.status(401).json({ err: { message: 'Invalid Comment' } });
+  const tokenData = await authController.verifyAsync(req.token, process.env.JWT_SECRET);
+
+  const likedComment = await Comment.findByIdAndUpdate(req.params.id, { $push: { likes: tokenData.user.id } }, { new: true });
+  if (!likedComment) return res.status(404).json({ err: 'Comment not found' });
+
+  return res.json({ likedComment });
+});

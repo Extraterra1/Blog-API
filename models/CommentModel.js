@@ -21,11 +21,13 @@ const commentSchema = new Schema({
     type: Date,
     default: Date.now
   },
-  likes: {
-    type: Number,
-    trim: true,
-    default: 0
-  }
+  likes: [
+    {
+      type: mongoose.Types.ObjectId,
+      required: true,
+      ref: 'User'
+    }
+  ]
 });
 
 module.exports = mongoose.model('Comment', commentSchema);

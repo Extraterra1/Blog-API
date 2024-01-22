@@ -30,4 +30,6 @@ router.get('/users/:id/comments', setToken, commentsController.getCommentsByUser
 
 router.post('/comments/create', setToken, commentsController.createComment);
 
+router.patch('/comments/:id/like', setToken, commentsController.likeComment);
+
 module.exports = router;
