@@ -26,6 +26,8 @@ router.patch('/posts/:id', setToken, postsController.editPost);
 
 router.get('/users/:id/posts', postsController.getPostsByUser);
 
+router.get('/users/:id/comments', setToken, commentsController.getCommentsByUser);
+
 router.post('/comments/create', setToken, commentsController.createComment);
 
 module.exports = router;
