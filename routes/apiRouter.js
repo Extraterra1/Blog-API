@@ -3,6 +3,7 @@ const router = express.Router();
 const setToken = require('../middleware/setToken');
 const authController = require('../controllers/authController');
 const postsController = require('../controllers/postsController');
+const commentsController = require('../controllers/commentsController');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -24,5 +25,7 @@ router.delete('/posts/:id', setToken, postsController.deletePost);
 router.patch('/posts/:id', setToken, postsController.editPost);
 
 router.get('/users/:id/posts', postsController.getPostsByUser);
+
+router.post('/comments/create', setToken, commentsController.createComment);
 
 module.exports = router;

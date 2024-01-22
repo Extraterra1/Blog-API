@@ -45,7 +45,7 @@ exports.createComment = [
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(401).json({ err: errors.array(), type: 'bodyValidation' });
 
-    const newComment = new Post({ content: req.body.content, author: req.body.author, post: req.body.post });
+    const newComment = new Comment({ content: req.body.content, author: req.body.author, post: req.body.post });
     await newComment.save();
 
     return res.json({ newComment });
