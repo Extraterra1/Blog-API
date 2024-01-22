@@ -57,11 +57,21 @@ exports.likeComment = asyncHandler(async (req, res) => {
   if (!ObjectId.isValid(req.params.id)) return res.status(401).json({ err: { message: 'Invalid Comment' } });
   const tokenData = await authController.verifyAsync(req.token, process.env.JWT_SECRET);
 
-  const isAlreadyLiked = await Comment.findOne({ likes: tokenData.user.id });
+  const isAlreadyLiked = await Comment.findOne({ _id: req.params.id, likes: tokenData.user.id });
   if (isAlreadyLiked) return res.json({ isAlreadyLiked, msg: `User ${tokenData.user.username} already liked that comment` });
 
   const likedComment = await Comment.findByIdAndUpdate(req.params.id, { $push: { likes: tokenData.user.id } }, { new: true });
   if (!likedComment) return res.status(404).json({ err: 'Comment not found' });
 
   return res.json({ likedComment });
+});
+
+exports.removeLike = asyncHandler(async (req, res) => {
+  if (!ObjectId.isValid(req.params.id)) return res.status(401).json({ err: { message: 'Invalid Comment' } });
+  const tokenData = await authController.verifyAsync(req.token, process.env.JWT_SECRET);
+
+  const updatedComment = await Comment.findByIdAndUpdate(req.params.id, { $pull: { likes: tokenData.user.id } }, { new: true });
+  if (!updatedComment) return res.status(404).json({ err: 'Comment not found' });
+
+  return res.json({ updatedComment });
 });

@@ -32,4 +32,6 @@ router.post('/comments/create', setToken, commentsController.createComment);
 
 router.patch('/comments/:id/like', setToken, commentsController.likeComment);
 
+router.delete('/comments/:id/like', setToken, commentsController.removeLike);
+
 module.exports = router;
