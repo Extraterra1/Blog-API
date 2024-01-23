@@ -93,7 +93,7 @@ exports.editPost = [
 
     if (!ObjectId.isValid(req.params.id)) return res.status(401).json({ err: { message: 'Invalid Post' } });
 
-    const post = new Post({ title: req.body.title, content: req.body.content, author: req.body.author, _id: req.params.id, imgUrl: req.body.imgUrl });
+    const post = { title: req.body.title, content: req.body.content, author: req.body.author, _id: req.params.id, imgUrl: req.body.imgUrl };
 
     const updatedPost = await Post.findByIdAndUpdate(req.params.id, post);
     if (!updatedPost) return res.status(404).json({ err: { message: 'Post not found' } });

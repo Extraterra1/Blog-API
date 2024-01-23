@@ -47,7 +47,8 @@ exports.createComment = [
     if (!errors.isEmpty()) return res.status(401).json({ err: errors.array(), type: 'bodyValidation' });
 
     const newComment = new Comment({ content: req.body.content, author: req.body.author, post: req.body.post });
-    await newComment.save();
+    const comment = await newComment.save();
+    if (comment) await Post.findByIdAndUpdate(req.body.post, { $push: { comments: comment._id } });
 
     return res.json({ newComment });
   })
