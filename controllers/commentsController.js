@@ -54,6 +54,19 @@ exports.createComment = [
   })
 ];
 
+exports.deleteComment = asyncHandler(async (req, res) => {
+  if (!ObjectId.isValid(req.params.id)) return res.status(401).json({ err: { message: 'Invalid Comment' } });
+  const tokenData = await authController.verifyAsync(req.token, process.env.JWT_SECRET);
+
+  const comment = await Comment.findById(req.params.id);
+  if (!comment) return res.status(404).json({ err: 'Comment not found' });
+  if (tokenData.user.role !== 'author' || tokenData.user.id !== comment.author)
+    return res.status(401).json({ err: 'You must be the author of the comment or an authorized poster in order to delete it.' });
+
+  const deletedComment = await comment.remove();
+  return res.json({ deletedComment });
+});
+
 exports.likeComment = asyncHandler(async (req, res) => {
   if (!ObjectId.isValid(req.params.id)) return res.status(401).json({ err: { message: 'Invalid Comment' } });
   const tokenData = await authController.verifyAsync(req.token, process.env.JWT_SECRET);
