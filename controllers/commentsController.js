@@ -82,7 +82,7 @@ exports.editComment = [
     if (tokenData.user.role !== 'author' || tokenData.user.id !== comment.author.toString())
       return res.status(401).json({ err: 'You must be the author of the comment or an authorized poster in order to edit.' });
 
-    const updatedComment = await Comment.findByIdAndUpdate(req.params.id, { content: req.body.content });
+    const updatedComment = await Comment.findByIdAndUpdate(req.params.id, { content: req.body.content }, { new: true }).populate('author');
     if (!updatedComment) return res.status(404).json({ err: { message: 'Something went wrong' } });
 
     return res.json({ updatedComment });

@@ -93,11 +93,11 @@ exports.editPost = [
     const tokenData = await authController.verifyAsync(req.token, process.env.JWT_SECRET);
     if (tokenData.user.role !== 'author') return res.status(403).json({ err: { message: 'You need to be an author to edit a post' } });
 
-    if (!ObjectId.isValid(req.params.id)) return res.status(401).json({ err: { message: 'Invalid Post' } });
+    if (!ObjectId.isValid(req.params.id)) return res.status(404).json({ err: { message: 'Invalid Post' } });
 
     const post = { title: req.body.title, content: req.body.content, author: req.body.author, _id: req.params.id, imgUrl: req.body.imgUrl };
 
-    const updatedPost = await Post.findByIdAndUpdate(req.params.id, post);
+    const updatedPost = await Post.findByIdAndUpdate(req.params.id, post, { new: true });
     if (!updatedPost) return res.status(404).json({ err: { message: 'Post not found' } });
 
     return res.json({ updatedPost });
