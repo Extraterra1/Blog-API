@@ -60,10 +60,12 @@ exports.deleteComment = asyncHandler(async (req, res) => {
 
   const comment = await Comment.findById(req.params.id);
   if (!comment) return res.status(404).json({ err: 'Comment not found' });
-  if (tokenData.user.role !== 'author' || tokenData.user.id !== comment.author)
+  if (tokenData.user.role !== 'author' || tokenData.user.id !== comment.author.toString())
     return res.status(401).json({ err: 'You must be the author of the comment or an authorized poster in order to delete it.' });
 
-  const deletedComment = await comment.remove();
+  const deletedComment = await Comment.findByIdAndDelete(req.params.id);
+  if (deletedComment) await Post.findByIdAndUpdate(comment.post, { $pull: { comments: comment._id } });
+
   return res.json({ deletedComment });
 });
 

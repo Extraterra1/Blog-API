@@ -30,6 +30,8 @@ router.get('/users/:id/comments', setToken, commentsController.getCommentsByUser
 
 router.post('/comments/create', setToken, commentsController.createComment);
 
+router.delete('/comments/:id', setToken, commentsController.deleteComment);
+
 router.patch('/comments/:id/like', setToken, commentsController.likeComment);
 
 router.delete('/comments/:id/like', setToken, commentsController.removeLike);
