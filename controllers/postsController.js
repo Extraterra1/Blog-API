@@ -19,7 +19,9 @@ exports.getPosts = asyncHandler(async (req, res) => {
 exports.postDetail = asyncHandler(async (req, res) => {
   if (!ObjectId.isValid(req.params.id)) return res.status(401).json({ err: { message: 'Invalid Post' } });
 
-  const post = await Post.findById(req.params.id).populate('author');
+  const post = await Post.findById(req.params.id)
+    .populate('author')
+    .populate({ path: 'comments', populate: { path: 'author' } });
   if (!post) return res.status(404).json({ err: { message: 'Post not found' } });
 
   return res.json({ post });
