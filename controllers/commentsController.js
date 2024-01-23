@@ -69,6 +69,26 @@ exports.deleteComment = asyncHandler(async (req, res) => {
   return res.json({ deletedComment });
 });
 
+exports.editComment = [
+  body('content', 'Comment must not be empty').trim().isLength({ min: 1 }).escape(),
+
+  asyncHandler(async (req, res) => {
+    if (!ObjectId.isValid(req.params.id)) return res.status(404).json({ err: { message: 'Invalid Comment' } });
+
+    const comment = await Comment.findById(req.params.id);
+    if (!comment) return res.status(404).json({ err: 'Comment not found' });
+
+    const tokenData = await authController.verifyAsync(req.token, process.env.JWT_SECRET);
+    if (tokenData.user.role !== 'author' || tokenData.user.id !== comment.author.toString())
+      return res.status(401).json({ err: 'You must be the author of the comment or an authorized poster in order to edit.' });
+
+    const updatedComment = await Comment.findByIdAndUpdate(req.params.id, { content: req.body.content });
+    if (!updatedComment) return res.status(404).json({ err: { message: 'Something went wrong' } });
+
+    return res.json({ updatedComment });
+  })
+];
+
 exports.likeComment = asyncHandler(async (req, res) => {
   if (!ObjectId.isValid(req.params.id)) return res.status(401).json({ err: { message: 'Invalid Comment' } });
   const tokenData = await authController.verifyAsync(req.token, process.env.JWT_SECRET);
