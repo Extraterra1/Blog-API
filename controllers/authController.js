@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const util = require('util');
 const moment = require('moment');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 
 const User = require('../models/userModel');
 
@@ -67,5 +69,22 @@ exports.register = [
       if (err) return res.status(500).json({ err });
       return res.json({ token, user: cleanUser });
     });
+  })
+];
+
+exports.upgradeUser = [
+  body('key', 'Wrong upgrade key').trim().isLength({ min: 2 }).equals('supersecret'),
+  asyncHandler(async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(401).json({ err: errors.array(), type: 'bodyValidation' });
+
+    if (!ObjectId.isValid(req.params.id)) return res.status(404).json({ err: { message: 'Invalid User' } });
+
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ err: { message: 'User not Found' } });
+
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, { role: 'author' });
+
+    console.log(updatedUser);
   })
 ];
