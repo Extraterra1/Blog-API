@@ -94,7 +94,7 @@ exports.upgradeUser = [
 
     jwt.sign({ user: cleanUser, exp: moment().add(3, 'days').unix() }, process.env.JWT_SECRET, (err, token) => {
       if (err) return res.status(500).json({ err });
-      return res.json({ token, user: updatedUser });
+      return res.json({ token, user: cleanUser });
     });
   })
 ];
