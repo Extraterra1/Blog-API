@@ -90,8 +90,9 @@ exports.upgradeUser = [
     if (user.role === 'author') return res.status(400).json({ err: { message: 'User is already an author' } });
 
     const updatedUser = await User.findByIdAndUpdate(req.params.id, { role: 'author' }, { new: true }).select({ password: false });
+    const cleanUser = { email: updatedUser.email, username: updatedUser.username, role: updatedUser.role, id: updatedUser._id };
 
-    jwt.sign({ user: updatedUser, exp: moment().add(3, 'days').unix() }, process.env.JWT_SECRET, (err, token) => {
+    jwt.sign({ user: cleanUser, exp: moment().add(3, 'days').unix() }, process.env.JWT_SECRET, (err, token) => {
       if (err) return res.status(500).json({ err });
       return res.json({ token, user: updatedUser });
     });
