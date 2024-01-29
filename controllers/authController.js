@@ -87,6 +87,7 @@ exports.upgradeUser = [
 
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ err: { message: 'User not Found' } });
+    if (user.role === 'author') return res.status(400).json({ err: { message: 'User is already an author' } });
 
     const updatedUser = await User.findByIdAndUpdate(req.params.id, { role: 'author' }, { new: true }).select({ password: false });
 
