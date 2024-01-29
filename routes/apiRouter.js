@@ -14,7 +14,7 @@ router.post('/login', authController.login);
 
 router.post('/register', authController.register);
 
-router.patch('/users/:id/upgrade', authController.upgradeUser);
+router.patch('/users/:id/upgrade', setToken, authController.upgradeUser);
 
 router.get('/posts', postsController.getPosts);
 

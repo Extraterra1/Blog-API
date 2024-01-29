@@ -9,7 +9,9 @@ const ObjectId = mongoose.Types.ObjectId;
 
 const User = require('../models/userModel');
 
-exports.verifyAsync = util.promisify(jwt.verify);
+const verifyAsync = util.promisify(jwt.verify);
+
+exports.verifyAsync = verifyAsync;
 
 exports.login = [
   body('username', 'Bad request').trim().isLength({ min: 2 }).optional(),
@@ -80,11 +82,17 @@ exports.upgradeUser = [
 
     if (!ObjectId.isValid(req.params.id)) return res.status(404).json({ err: { message: 'Invalid User' } });
 
+    const tokenData = await verifyAsync(req.token, process.env.JWT_SECRET);
+    if (tokenData.user.id !== req.params.id) return res.status(401).json({ err: 'Unauthorized' });
+
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ err: { message: 'User not Found' } });
 
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, { role: 'author' });
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, { role: 'author' }, { new: true }).select({ password: false });
 
-    console.log(updatedUser);
+    jwt.sign({ user: updatedUser, exp: moment().add(3, 'days').unix() }, process.env.JWT_SECRET, (err, token) => {
+      if (err) return res.status(500).json({ err });
+      return res.json({ token, user: updatedUser });
+    });
   })
 ];
